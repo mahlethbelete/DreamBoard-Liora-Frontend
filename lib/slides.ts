@@ -8,8 +8,8 @@ export const AUTH_SLIDES: Slide[] = [
 ]
 
 export const HOME_SLIDES: Slide[] = [
-  { src: "/slides/1.jpg", line: "A better you is still possible." },
-  { src: "/slides/2.jpg", line: "Small steps today create a big tomorrow." },
-  { src: "/slides/3.jpg", line: "Dream it. Plan it. Live it." },
-  { src: "/slides/4.jpg", line: "Not just a wishlist. A plan." },
+  { src: "/slides/home-1.jpg", line: "A better you is still possible." },
+  { src: "/slides/home-2.jpg", line: "Small steps today create a big tomorrow." },
+  { src: "/slides/home-3.jpg", line: "Dream it. Plan it. Live it." },
+  { src: "/slides/home-4.jpg", line: "Not just a wishlist. A plan." },
 ]
