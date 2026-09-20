@@ -80,14 +80,39 @@ export function Sidebar() {
         )}
       </div>
 
-      <div className="hidden border-t border-plum/10 pt-4 md:block">
-        <p className="truncate text-sm font-medium">{user?.name}</p>
-        <button
-          onClick={logout}
-          className="mt-1 text-xs text-plum/50 transition hover:text-plum"
-        >
-          Sign out
-        </button>
+      <div className="hidden md:block">
+        <div className="flex items-center gap-3 rounded-2xl bg-beige/70 p-3">
+          <div className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-plum text-sm font-medium text-cream">
+            {user?.name?.[0]?.toUpperCase()}
+          </div>
+
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium leading-tight">
+              {user?.name}
+            </p>
+            <p className="truncate text-xs text-plum/45">{user?.email}</p>
+          </div>
+
+          <button
+            onClick={logout}
+            aria-label="Sign out"
+            title="Sign out"
+            className="shrink-0 rounded-lg p-1.5 text-plum/40 transition hover:bg-white hover:text-plum"
+          >
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="h-[18px] w-[18px]"
+            >
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <path d="M16 17l5-5-5-5M21 12H9" />
+            </svg>
+          </button>
+        </div>
       </div>
     </aside>
   );
