@@ -1,62 +1,70 @@
-import type { Category, Suggestion, User, VisionItem, VisionItemInput } from "./types"
+import type {
+  Category,
+  ImageResult,
+  Suggestion,
+  User,
+  VisionItem,
+  VisionItemInput,
+} from "./types";
 
-const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
-const TOKEN_KEY = "liora_token"
+const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const TOKEN_KEY = "liora_token";
 
 export function getToken(): string | null {
-  if (typeof window === "undefined") return null
-  return window.localStorage.getItem(TOKEN_KEY)
+  if (typeof window === "undefined") return null;
+  return window.localStorage.getItem(TOKEN_KEY);
 }
 
 export function setToken(token: string) {
-  window.localStorage.setItem(TOKEN_KEY, token)
+  window.localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearToken() {
-  window.localStorage.removeItem(TOKEN_KEY)
+  window.localStorage.removeItem(TOKEN_KEY);
 }
 
 export class ApiError extends Error {
-  status: number
+  status: number;
   constructor(status: number, message: string) {
-    super(message)
-    this.status = status
+    super(message);
+    this.status = status;
   }
 }
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
-  const token = getToken()
+  const token = getToken();
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string>),
-  }
+  };
 
-  if (token) headers.Authorization = `Bearer ${token}`
+  if (token) headers.Authorization = `Bearer ${token}`;
   if (options.body && !headers["Content-Type"]) {
-    headers["Content-Type"] = "application/json"
+    headers["Content-Type"] = "application/json";
   }
 
-  const res = await fetch(`${BASE}${path}`, { ...options, headers })
+  const res = await fetch(`${BASE}${path}`, { ...options, headers });
 
   if (res.status === 401) {
-    clearToken()
-    if (typeof window !== "undefined") window.location.href = "/login"
-    throw new ApiError(401, "Your session expired. Sign in again.")
+    clearToken();
+    if (typeof window !== "undefined") window.location.href = "/login";
+    throw new ApiError(401, "Your session expired. Sign in again.");
   }
 
   if (!res.ok) {
-    let detail = "Something went wrong"
+    let detail = "Something went wrong";
     try {
-      const body = await res.json()
-      if (typeof body.detail === "string") detail = body.detail
-      else if (Array.isArray(body.detail)) detail = body.detail[0]?.msg ?? detail
+      const body = await res.json();
+      if (typeof body.detail === "string") detail = body.detail;
+      else if (Array.isArray(body.detail))
+        detail = body.detail[0]?.msg ?? detail;
     } catch {
       /* response had no JSON body */
     }
-    throw new ApiError(res.status, detail)
+    throw new ApiError(res.status, detail);
   }
 
-  if (res.status === 204) return undefined as T
-  return res.json()
+  if (res.status === 204) return undefined as T;
+  return res.json();
 }
 
 export const api = {
@@ -71,22 +79,20 @@ export const api = {
       method: "POST",
       headers: { "Content-Type": "application/x-www-form-urlencoded" },
       body: new URLSearchParams({ username: email, password }),
-    })
+    });
 
     if (!res.ok) {
-      let detail = "Incorrect email or password"
+      let detail = "Incorrect email or password";
       try {
-        const body = await res.json()
-        if (typeof body.detail === "string") detail = body.detail
-      } catch {
-        /* ignore */
-      }
-      throw new ApiError(res.status, detail)
+        const body = await res.json();
+        if (typeof body.detail === "string") detail = body.detail;
+      } catch {}
+      throw new ApiError(res.status, detail);
     }
 
-    const data: { access_token: string } = await res.json()
-    setToken(data.access_token)
-    return data
+    const data: { access_token: string } = await res.json();
+    setToken(data.access_token);
+    return data;
   },
 
   me: () => request<User>("/auth/me"),
@@ -110,7 +116,9 @@ export const api = {
 
   visionItems: (categoryId?: number) =>
     request<VisionItem[]>(
-      categoryId ? `/vision-items/?category_id=${categoryId}` : "/vision-items/"
+      categoryId
+        ? `/vision-items/?category_id=${categoryId}`
+        : "/vision-items/",
     ),
 
   createVisionItem: (data: VisionItemInput) =>
@@ -132,6 +140,10 @@ export const api = {
     request<{ suggestions: Suggestion[] }>("/ai/suggest", {
       method: "POST",
       body: JSON.stringify({ prompt, category_id: categoryId }),
-    }),}
+    }),
 
-
+  searchImages: (q: string) =>
+    request<{ results: ImageResult[] }>(
+      `/images/search?q=${encodeURIComponent(q)}`,
+    ),
+};

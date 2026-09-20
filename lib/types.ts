@@ -43,3 +43,9 @@ export type Suggestion = {
   title: string
   description: string
 }
+
+export type ImageResult = {
+  url: string
+  thumb: string
+  alt: string
+}

@@ -1,16 +1,17 @@
-"use client"
+"use client";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { api } from "@/lib/api"
-import { Alert, Button, Field, Select } from "@/components/ui"
-import type { Category, VisionItem, VisionStatus } from "@/lib/types"
+import { api } from "@/lib/api";
+import { Alert, Button, Field, Select } from "@/components/ui";
+import { ImagePicker } from "@/components/ImagePicker";
+import type { Category, VisionItem, VisionStatus } from "@/lib/types";
 
 const STATUSES: { value: VisionStatus; label: string }[] = [
   { value: "not_started", label: "Not started" },
   { value: "in_progress", label: "In progress" },
   { value: "achieved", label: "Achieved" },
-]
+];
 
 export function AddItemModal({
   categories,
@@ -19,33 +20,33 @@ export function AddItemModal({
   onClose,
   onSaved,
 }: {
-  categories: Category[]
-  defaultCategoryId?: number
-  item?: VisionItem
-  onClose: () => void
-  onSaved: () => void
+  categories: Category[];
+  defaultCategoryId?: number;
+  item?: VisionItem;
+  onClose: () => void;
+  onSaved: () => void;
 }) {
-  const editing = Boolean(item)
+  const editing = Boolean(item);
 
-  const [title, setTitle] = useState(item?.title ?? "")
-  const [description, setDescription] = useState(item?.description ?? "")
-  const [imageUrl, setImageUrl] = useState(item?.image_url ?? "")
+  const [title, setTitle] = useState(item?.title ?? "");
+  const [description, setDescription] = useState(item?.description ?? "");
+  const [imageUrl, setImageUrl] = useState(item?.image_url ?? "");
   const [targetDate, setTargetDate] = useState(
     item?.target_date ? item.target_date.slice(0, 10) : "",
-  )
+  );
   const [status, setStatus] = useState<VisionStatus>(
     item?.status ?? "not_started",
-  )
+  );
   const [categoryId, setCategoryId] = useState(
     item?.category_id ?? defaultCategoryId ?? categories[0]?.id ?? 0,
-  )
+  );
 
-  const [error, setError] = useState("")
-  const [busy, setBusy] = useState(false)
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
 
   async function save() {
-    setError("")
-    setBusy(true)
+    setError("");
+    setBusy(true);
 
     const payload = {
       title,
@@ -54,16 +55,16 @@ export function AddItemModal({
       target_date: targetDate ? new Date(targetDate).toISOString() : null,
       category_id: Number(categoryId),
       status,
-    }
+    };
 
     try {
-      if (item) await api.updateVisionItem(item.id, payload)
-      else await api.createVisionItem(payload)
-      onSaved()
-      onClose()
+      if (item) await api.updateVisionItem(item.id, payload);
+      else await api.createVisionItem(payload);
+      onSaved();
+      onClose();
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not save")
-      setBusy(false)
+      setError(e instanceof Error ? e.message : "Could not save");
+      setBusy(false);
     }
   }
 
@@ -111,23 +112,7 @@ export function AddItemModal({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          <div>
-            <Field
-              label="Image link"
-              value={imageUrl}
-              placeholder="https://..."
-              onChange={(e) => setImageUrl(e.target.value)}
-            />
-            {imageUrl && (
-              <img
-                src={imageUrl}
-                alt=""
-                className="mt-2 h-32 w-full rounded-xl object-cover"
-                onError={(e) => (e.currentTarget.style.display = "none")}
-                onLoad={(e) => (e.currentTarget.style.display = "block")}
-              />
-            )}
-          </div>
+          <ImagePicker value={imageUrl} seed={title} onPick={setImageUrl} />
           <div className="grid grid-cols-2 gap-3">
             <Select
               label="Category"
@@ -185,5 +170,5 @@ export function AddItemModal({
         </div>
       </div>
     </div>
-  )
+  );
 }
