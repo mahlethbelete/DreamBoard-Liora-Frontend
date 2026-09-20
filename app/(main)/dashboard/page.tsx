@@ -10,6 +10,9 @@ import { AddItemModal } from "@/components/AddItemModal"
 import { Button, Sparkle } from "@/components/ui"
 import type { Category, VisionItem } from "@/lib/types"
 
+import { Slideshow } from "@/components/Slideshow"
+import { HOME_SLIDES } from "@/lib/slides"
+
 export default function DashboardPage() {
   const { user } = useAuth()
   const [categories, setCategories] = useState<Category[]>([])
@@ -53,15 +56,8 @@ export default function DashboardPage() {
       </header>
 
       <section className="mb-10 grid gap-4 md:grid-cols-[1.6fr_1fr]">
-        <div className="relative overflow-hidden rounded-2xl bg-beige p-8">
-          <div className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-rose/45 blur-3xl" />
-          <div className="absolute -bottom-20 left-10 h-48 w-64 rounded-full bg-sage/35 blur-3xl" />
-          <div className="relative">
-            <Sparkle className="mb-3 h-4 w-4 text-gold" />
-            <p className="max-w-xs font-display text-2xl leading-snug">
-              A better you is still possible.
-            </p>
-          </div>
+        <div className="relative min-h-[220px] overflow-hidden rounded-2xl bg-plum">
+          <Slideshow slides={HOME_SLIDES} interval={6000} />
         </div>
 
         <div className="rounded-2xl border border-plum/10 bg-white p-6">

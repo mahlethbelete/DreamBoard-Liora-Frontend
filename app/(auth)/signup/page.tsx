@@ -6,6 +6,9 @@ import Link from "next/link"
 import { useAuth } from "@/lib/auth"
 import { Alert, Button, Field, Spinner, Wordmark } from "@/components/ui"
 
+import { Slideshow } from "@/components/Slideshow"
+import { AUTH_SLIDES } from "@/lib/slides"
+
 export default function SignupPage() {
   const { signup } = useAuth()
   const [name, setName] = useState("")
@@ -29,16 +32,12 @@ export default function SignupPage() {
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      <section className="relative hidden overflow-hidden bg-beige p-12 lg:flex lg:flex-col lg:justify-end">
-        <div className="absolute -left-20 -top-20 h-96 w-96 rounded-full bg-sage/35 blur-3xl" />
-        <div className="absolute -bottom-24 right-0 h-96 w-96 rounded-full bg-rose/40 blur-3xl" />
-        <div className="relative">
-          <Wordmark className="text-5xl" />
-          <p className="mt-1 text-xs tracking-[0.25em] text-plum/50">
+            <section className="relative hidden overflow-hidden bg-plum lg:block">
+        <Slideshow slides={AUTH_SLIDES} />
+        <div className="absolute left-12 top-12 z-10">
+          <Wordmark className="h-10 brightness-0 invert" />
+          <p className="mt-2 text-xs tracking-[0.25em] text-cream/60">
             YOUR VISION. YOUR WAY.
-          </p>
-          <p className="mt-8 max-w-sm font-display text-2xl leading-snug text-plum/80">
-            Not just dreams. Plans, steps, real life.
           </p>
         </div>
       </section>

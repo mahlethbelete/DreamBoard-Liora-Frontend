@@ -46,9 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const signup = useCallback(
     async (name: string, email: string, password: string) => {
       await api.signup(name, email, password)
-      await api.login(email, password)
-      setUser(await api.me())
-      router.push("/dashboard")
+      router.push("/login?created=1")
     },
     [router]
   )

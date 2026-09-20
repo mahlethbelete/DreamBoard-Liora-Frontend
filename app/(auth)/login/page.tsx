@@ -1,41 +1,49 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
+import { Suspense, useState } from "react";
+import Link from "next/link";
 
-import { useAuth } from "@/lib/auth"
-import { Alert, Button, Field, PasswordField, Spinner, Wordmark } from "@/components/ui"
+import { useAuth } from "@/lib/auth";
+import {
+  Alert,
+  Button,
+  Field,
+  PasswordField,
+  Spinner,
+  Wordmark,
+} from "@/components/ui";
+import { useSearchParams } from "next/navigation";
+import { Slideshow } from "@/components/Slideshow";
+import { AUTH_SLIDES } from "@/lib/slides";
 
-export default function LoginPage() {
-  const { login } = useAuth()
-  const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("")
-  const [error, setError] = useState("")
-  const [busy, setBusy] = useState(false)
+function LoginForm() {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [busy, setBusy] = useState(false);
+  const params = useSearchParams();
+  const justCreated = params.get("created") === "1";
 
   async function handleSubmit() {
-    setError("")
-    setBusy(true)
+    setError("");
+    setBusy(true);
     try {
-      await login(email, password)
+      await login(email, password);
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Could not sign in")
-      setBusy(false)
+      setError(e instanceof Error ? e.message : "Could not sign in");
+      setBusy(false);
     }
   }
 
   return (
     <main className="grid min-h-screen lg:grid-cols-2">
-      <section className="relative hidden overflow-hidden bg-beige p-12 lg:flex lg:flex-col lg:justify-end">
-        <div className="absolute -right-24 -top-24 h-96 w-96 rounded-full bg-rose/40 blur-3xl" />
-        <div className="absolute bottom-10 left-1/2 h-80 w-[36rem] -translate-x-1/2 rounded-[50%] bg-sage/30 blur-3xl" />
-        <div className="relative">
-          <Wordmark className="text-5xl" />
-          <p className="mt-1 text-xs tracking-[0.25em] text-plum/50">
+      <section className="relative hidden overflow-hidden bg-plum lg:block">
+        <Slideshow slides={AUTH_SLIDES} />
+        <div className="absolute left-12 top-12 z-10">
+          <Wordmark className="h-10 brightness-0 invert" />
+          <p className="mt-2 text-xs tracking-[0.25em] text-cream/60">
             YOUR VISION. YOUR WAY.
-          </p>
-          <p className="mt-8 max-w-sm font-display text-2xl leading-snug text-plum/80">
-            A calm space to plan, collect and bring your dreams to life.
           </p>
         </div>
       </section>
@@ -48,7 +56,9 @@ export default function LoginPage() {
 
           <h1 className="font-display text-3xl">Welcome back</h1>
           <p className="mt-1.5 mb-7 text-sm text-plum/60">
-            Your board is where you left it.
+            {justCreated
+              ? "Board created. Sign in to open it."
+              : "Your board is where you left it."}
           </p>
 
           <div className="space-y-4">
@@ -81,12 +91,23 @@ export default function LoginPage() {
 
           <p className="mt-6 text-center text-sm text-plum/60">
             New here?{" "}
-            <Link href="/signup" className="font-medium text-plum underline-offset-4 hover:underline">
+            <Link
+              href="/signup"
+              className="font-medium text-plum underline-offset-4 hover:underline"
+            >
               Make a board
             </Link>
           </p>
         </div>
       </section>
     </main>
-  )
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginForm />
+    </Suspense>
+  );
 }
