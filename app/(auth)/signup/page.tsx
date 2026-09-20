@@ -4,8 +4,7 @@ import { useState } from "react"
 import Link from "next/link"
 
 import { useAuth } from "@/lib/auth"
-import { Alert, Button, Field, Spinner, Wordmark } from "@/components/ui"
-
+import { Alert, Button, Field, PasswordField, Spinner, Wordmark } from "@/components/ui"
 import { Slideshow } from "@/components/Slideshow"
 import { AUTH_SLIDES } from "@/lib/slides"
 
@@ -67,9 +66,8 @@ export default function SignupPage() {
               placeholder="you@example.com"
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Field
+            <PasswordField
               label="Password"
-              type="password"
               value={password}
               placeholder="At least 8 characters"
               error={tooShort ? "Use at least 8 characters." : undefined}
