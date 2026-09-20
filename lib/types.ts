@@ -38,3 +38,8 @@ export type VisionItemInput = {
   category_id: number
   status?: VisionStatus
 }
+
+export type Suggestion = {
+  title: string
+  description: string
+}

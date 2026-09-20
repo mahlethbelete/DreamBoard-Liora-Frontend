@@ -4,7 +4,7 @@ import { useState } from "react"
 
 import { api } from "@/lib/api"
 import { Alert, Button, Field, Select } from "@/components/ui"
-import type { Category, VisionStatus } from "@/lib/types"
+import type { Category, VisionItem, VisionStatus } from "@/lib/types"
 
 const STATUSES: { value: VisionStatus; label: string }[] = [
   { value: "not_started", label: "Not started" },
@@ -15,37 +15,50 @@ const STATUSES: { value: VisionStatus; label: string }[] = [
 export function AddItemModal({
   categories,
   defaultCategoryId,
+  item,
   onClose,
   onSaved,
 }: {
   categories: Category[]
   defaultCategoryId?: number
+  item?: VisionItem
   onClose: () => void
   onSaved: () => void
 }) {
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [imageUrl, setImageUrl] = useState("")
-  const [targetDate, setTargetDate] = useState("")
-  const [status, setStatus] = useState<VisionStatus>("not_started")
-  const [categoryId, setCategoryId] = useState(
-    defaultCategoryId ?? categories[0]?.id ?? 0
+  const editing = Boolean(item)
+
+  const [title, setTitle] = useState(item?.title ?? "")
+  const [description, setDescription] = useState(item?.description ?? "")
+  const [imageUrl, setImageUrl] = useState(item?.image_url ?? "")
+  const [targetDate, setTargetDate] = useState(
+    item?.target_date ? item.target_date.slice(0, 10) : "",
   )
+  const [status, setStatus] = useState<VisionStatus>(
+    item?.status ?? "not_started",
+  )
+  const [categoryId, setCategoryId] = useState(
+    item?.category_id ?? defaultCategoryId ?? categories[0]?.id ?? 0,
+  )
+
   const [error, setError] = useState("")
   const [busy, setBusy] = useState(false)
 
   async function save() {
     setError("")
     setBusy(true)
+
+    const payload = {
+      title,
+      description: description || null,
+      image_url: imageUrl || null,
+      target_date: targetDate ? new Date(targetDate).toISOString() : null,
+      category_id: Number(categoryId),
+      status,
+    }
+
     try {
-      await api.createVisionItem({
-        title,
-        description: description || null,
-        image_url: imageUrl || null,
-        target_date: targetDate ? new Date(targetDate).toISOString() : null,
-        category_id: Number(categoryId),
-        status,
-      })
+      if (item) await api.updateVisionItem(item.id, payload)
+      else await api.createVisionItem(payload)
       onSaved()
       onClose()
     } catch (e) {
@@ -65,9 +78,13 @@ export function AddItemModal({
       >
         <div className="mb-5 flex items-start justify-between">
           <div>
-            <h2 className="font-display text-xl">Save something</h2>
+            <h2 className="font-display text-xl">
+              {editing ? "Edit" : "Save something"}
+            </h2>
             <p className="mt-0.5 text-sm text-plum/55">
-              A title and a category is enough.
+              {editing
+                ? "Change anything, including the image."
+                : "A title and a category is enough."}
             </p>
           </div>
           <button
@@ -94,13 +111,23 @@ export function AddItemModal({
             onChange={(e) => setDescription(e.target.value)}
           />
 
-          <Field
-            label="Image link"
-            value={imageUrl}
-            placeholder="https://..."
-            onChange={(e) => setImageUrl(e.target.value)}
-          />
-
+          <div>
+            <Field
+              label="Image link"
+              value={imageUrl}
+              placeholder="https://..."
+              onChange={(e) => setImageUrl(e.target.value)}
+            />
+            {imageUrl && (
+              <img
+                src={imageUrl}
+                alt=""
+                className="mt-2 h-32 w-full rounded-xl object-cover"
+                onError={(e) => (e.currentTarget.style.display = "none")}
+                onLoad={(e) => (e.currentTarget.style.display = "block")}
+              />
+            )}
+          </div>
           <div className="grid grid-cols-2 gap-3">
             <Select
               label="Category"
@@ -152,7 +179,7 @@ export function AddItemModal({
               onClick={save}
               disabled={busy || !title || !categoryId}
             >
-              {busy ? "Saving" : "Save"}
+              {busy ? "Saving" : editing ? "Save changes" : "Save"}
             </Button>
           </div>
         </div>

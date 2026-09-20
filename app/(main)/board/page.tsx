@@ -8,6 +8,8 @@ import { api } from "@/lib/api";
 import { AddItemModal } from "@/components/AddItemModal";
 import { VisionItemCard } from "@/components/VisionItemCard";
 import { Button, Sparkle } from "@/components/ui";
+import { SuggestModal } from "@/components/SuggestModal";
+
 import type { Category, VisionItem, VisionStatus } from "@/lib/types";
 
 const FILTERS: { value: VisionStatus | "all"; label: string }[] = [
@@ -29,6 +31,8 @@ function Board() {
   const [status, setStatus] = useState<VisionStatus | "all">("all");
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
+  const [suggesting, setSuggesting] = useState(false);
+  const [editing, setEditing] = useState<VisionItem | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -70,9 +74,19 @@ function Board() {
             {items.filter((i) => i.status === "achieved").length} done
           </p>
         </div>
-        <Button onClick={() => setAdding(true)} disabled={!categories.length}>
-          Save something
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            onClick={() => setSuggesting(true)}
+            disabled={!categories.length}
+          >
+            <Sparkle className="h-3.5 w-3.5 text-gold" />
+            Help me dream
+          </Button>
+          <Button onClick={() => setAdding(true)} disabled={!categories.length}>
+            Save something
+          </Button>
+        </div>
       </header>
 
       <div className="no-bar mb-4 flex gap-2 overflow-x-auto pb-1">
@@ -144,7 +158,12 @@ function Board() {
       ) : (
         <div className="columns-2 gap-4 md:columns-3 xl:columns-4">
           {shown.map((item) => (
-            <VisionItemCard key={item.id} item={item} onChange={load} />
+            <VisionItemCard
+              key={item.id}
+              item={item}
+              onChange={load}
+              onEdit={() => setEditing(item)}
+            />
           ))}
         </div>
       )}
@@ -154,6 +173,22 @@ function Board() {
           categories={categories}
           defaultCategoryId={categoryId ?? undefined}
           onClose={() => setAdding(false)}
+          onSaved={load}
+        />
+      )}
+      {suggesting && (
+        <SuggestModal
+          categories={categories}
+          defaultCategoryId={categoryId ?? undefined}
+          onClose={() => setSuggesting(false)}
+          onSaved={load}
+        />
+      )}
+      {editing && (
+        <AddItemModal
+          categories={categories}
+          item={editing}
+          onClose={() => setEditing(null)}
           onSaved={load}
         />
       )}

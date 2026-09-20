@@ -15,9 +15,11 @@ const NEXT: Record<VisionStatus, VisionStatus> = {
 export function VisionItemCard({
   item,
   onChange,
+  onEdit,
 }: {
   item: VisionItem
   onChange: () => void
+  onEdit: () => void
 }) {
   const [busy, setBusy] = useState(false)
   const due = formatDate(item.target_date)
@@ -61,13 +63,22 @@ export function VisionItemCard({
               e.currentTarget.style.display = "none"
             }}
           />
-          <button
-            onClick={remove}
-            aria-label="Remove item"
-            className="absolute right-2 top-2 rounded-full bg-cream/90 px-2 py-1 text-xs text-plum opacity-0 transition group-hover:opacity-100 focus-visible:opacity-100"
-          >
-            Remove
-          </button>
+          <div className="absolute right-2 top-2 flex gap-1 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+            <button
+              onClick={onEdit}
+              aria-label="Edit item"
+              className="rounded-full bg-cream/90 px-2 py-1 text-xs text-plum"
+            >
+              Edit
+            </button>
+            <button
+              onClick={remove}
+              aria-label="Remove item"
+              className="rounded-full bg-cream/90 px-2 py-1 text-xs text-plum"
+            >
+              Remove
+            </button>
+          </div>
         </div>
       )}
 
@@ -75,13 +86,14 @@ export function VisionItemCard({
         <div className="flex items-start justify-between gap-2">
           <h3 className="text-[15px] font-semibold leading-snug">{item.title}</h3>
           {!item.image_url && (
-            <button
-              onClick={remove}
-              aria-label="Remove item"
-              className="shrink-0 text-xs text-plum/40 opacity-0 transition hover:text-plum group-hover:opacity-100 focus-visible:opacity-100"
-            >
-              Remove
-            </button>
+            <div className="flex shrink-0 gap-2 text-xs text-plum/40 opacity-0 transition group-hover:opacity-100 focus-within:opacity-100">
+              <button onClick={onEdit} className="hover:text-plum">
+                Edit
+              </button>
+              <button onClick={remove} className="hover:text-plum">
+                Remove
+              </button>
+            </div>
           )}
         </div>
 

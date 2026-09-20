@@ -1,4 +1,4 @@
-import type { Category, User, VisionItem, VisionItemInput } from "./types"
+import type { Category, Suggestion, User, VisionItem, VisionItemInput } from "./types"
 
 const BASE = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"
 const TOKEN_KEY = "liora_token"
@@ -127,6 +127,11 @@ export const api = {
 
   deleteVisionItem: (id: number) =>
     request<void>(`/vision-items/${id}`, { method: "DELETE" }),
-}
+
+  suggest: (prompt: string, categoryId: number) =>
+    request<{ suggestions: Suggestion[] }>("/ai/suggest", {
+      method: "POST",
+      body: JSON.stringify({ prompt, category_id: categoryId }),
+    }),}
 
 
