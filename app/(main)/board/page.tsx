@@ -28,6 +28,10 @@ function Board() {
   const [categoryId, setCategoryId] = useState<number | null>(
     categoryParam ? Number(categoryParam) : null,
   );
+
+  useEffect(() => {
+    setCategoryId(categoryParam ? Number(categoryParam) : null);
+  }, [categoryParam]);
   const [status, setStatus] = useState<VisionStatus | "all">("all");
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState(false);
